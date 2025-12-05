@@ -1,20 +1,18 @@
-import { StudentsList } from "../parts/students/StudentsList";
-import { NewStudentForm } from "../parts/students/NewStudentForm";
+import { Outlet, NavLink } from "react-router-dom";
 
 function Root() {
   return (
     <div id="main">
       <div id="menu">
         <nav>
-          <a>Студенты</a>
+          <NavLink to={"/students"}>Студенты</NavLink>
           <a>Преподаватели</a>
         </nav>
       </div>
-      <div id="main_page">
+      <div id="main-page">
         <h2>Тест-страница на Redux</h2>
         <hr />
-        <StudentsList />
-        <NewStudentForm />
+        <Outlet />
       </div>
     </div>
   );
