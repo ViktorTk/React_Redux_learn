@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { studentAdded } from "./studentsSlice";
-import { nanoid } from "@reduxjs/toolkit";
 
 export const NewStudentForm = () => {
   const [name, setName] = useState("");
@@ -18,15 +17,7 @@ export const NewStudentForm = () => {
 
   const onSaveStudentClick = () => {
     if (name && surn && age && spec) {
-      dispatch(
-        studentAdded({
-          id: nanoid(),
-          name,
-          surn,
-          age,
-          spec,
-        })
-      );
+      dispatch(studentAdded(name, surn, age, spec));
 
       setName("");
       setSurn("");
