@@ -78,3 +78,8 @@ form p {
   color: black;
   padding: 1px 12px 1px 12px;
 }
+
+.vote-button {
+  margin-right: 10px;
+  margin-bottom: 10px;
+}

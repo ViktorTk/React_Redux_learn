@@ -1,6 +1,7 @@
 import { useSelector } from "react-redux";
 import { NewStudentForm } from "./NewStudentForm";
 import { NavLink, Link } from "react-router-dom";
+import { UserVotes } from "./UserVotes";
 
 export const StudentsList = () => {
   const students = useSelector((state) => state.students);
@@ -9,6 +10,7 @@ export const StudentsList = () => {
     <div key={student.id} className="student-excerpt">
       <p>{student.name}</p>
       <p>{student.spec}</p>
+      <UserVotes student={student} />
       <Link to={`/students/${student.id}`} className="link-btn">
         подробнее
       </Link>
