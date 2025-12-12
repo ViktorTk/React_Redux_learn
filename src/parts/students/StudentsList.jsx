@@ -2,9 +2,10 @@ import { useSelector } from "react-redux";
 import { NewStudentForm } from "./NewStudentForm";
 import { NavLink, Link } from "react-router-dom";
 import { UserVotes } from "./UserVotes";
+import { selectAllStudents } from "./studentsSlice";
 
 export const StudentsList = () => {
-  const students = useSelector((state) => state.students);
+  const students = useSelector(selectAllStudents);
 
   const dispStudents = students.map((student) => (
     <div key={student.id} className="student-excerpt">

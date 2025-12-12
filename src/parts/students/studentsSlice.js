@@ -1,23 +1,10 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
 
-const initialState = [
-  {
-    id: 1,
-    name: "Stud1",
-    surn: "SurnStud1",
-    age: 20,
-    spec: "IT",
-    votes: { leader: 0, captain: 0 },
-  },
-  {
-    id: 2,
-    name: "Stud2",
-    surn: "SurnStud2",
-    age: 22,
-    spec: "econom",
-    votes: { leader: 0, captain: 0 },
-  },
-];
+const initialState = {
+  students: [],
+  status: "idle",
+  error: null,
+};
 
 const studentsSlice = createSlice({
   name: "students",
@@ -29,7 +16,7 @@ const studentsSlice = createSlice({
 
     studentAdded: {
       reducer(state, action) {
-        state.push(action.payload);
+        state.students.push(action.payload);
       },
       prepare(name, surn, age, spec, teacherId) {
         return {
@@ -48,7 +35,7 @@ const studentsSlice = createSlice({
 
     studentUpdated(state, action) {
       const { id, name, surn, age, spec } = action.payload;
-      const desiredStudent = state.find((student) => student.id == id);
+      const desiredStudent = state.students.find((student) => student.id == id);
       if (desiredStudent) {
         desiredStudent.name = name;
         desiredStudent.surn = surn;
@@ -58,7 +45,9 @@ const studentsSlice = createSlice({
     },
     voteClicked(state, action) {
       const { studentId, vote } = action.payload;
-      const currentStudent = state.find((student) => student.id == studentId);
+      const currentStudent = state.students.find(
+        (student) => student.id == studentId
+      );
       if (currentStudent) {
         currentStudent.votes[vote]++;
       }
@@ -69,3 +58,7 @@ const studentsSlice = createSlice({
 export const { studentAdded, studentUpdated, voteClicked } =
   studentsSlice.actions;
 export default studentsSlice.reducer;
+
+export const selectAllStudents = (state) => state.students.students;
+export const selectStudentById = (state, studentId) =>
+  state.students.students.find((student) => student.id == studentId);
