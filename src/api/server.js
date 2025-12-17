@@ -97,6 +97,30 @@ export const handlers = [
     await delay(ARTIFICIAL_DELAY_MS);
     return HttpResponse.json(db.teacher.getAll());
   }),
+  http.post("/fakeServer/students", async ({ request }) => {
+    const data = await request.json();
+
+    if (data.conetnt === "error") {
+      await delay(ARTIFICIAL_DELAY_MS);
+
+      return new HttpResponse("ошибка при сохранении данных на сеервер", {
+        status: 500,
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+    }
+
+    const student = db.student.findFirst({
+      where: { id: { equals: data.student } },
+    });
+    data.student = student;
+
+    data.votes = db.votes.create();
+
+    await delay(ARTIFICIAL_DELAY_MS);
+    return HttpResponse(serializeStudent(student));
+  }),
 ];
 
 export const worker = setupWorker(...handlers);

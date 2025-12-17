@@ -5,9 +5,11 @@ import App from "./App.jsx";
 import store from "./app/store.js";
 import { Provider } from "react-redux";
 import { worker } from "./api/server.js";
+import { fetchTeachers } from "./parts/teachers/teachersSlice.js";
 
 async function main() {
   await worker.start({ onUnhandledRequest: "bypass" });
+  store.dispatch(fetchTeachers());
 
   createRoot(document.getElementById("root")).render(
     <StrictMode>

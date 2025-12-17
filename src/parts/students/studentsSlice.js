@@ -1,4 +1,4 @@
-import { createSlice, nanoid, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { client } from "../../api/client";
 
 const initialState = {
@@ -31,6 +31,14 @@ export const fetchStudents = createAsyncThunk(
   }
 );
 
+export const addStudent = createAsyncThunk(
+  "products/addStudent",
+  async (newStudent) => {
+    const response = await client.post("/fakeServer/students", newStudent);
+    return response.data;
+  }
+);
+
 const studentsSlice = createSlice({
   name: "students",
   initialState,
@@ -39,28 +47,28 @@ const studentsSlice = createSlice({
     //   state.push(action.payload);
     // },
 
-    studentAdded: {
-      reducer(state, action) {
-        state.students.push(action.payload);
-      },
-      prepare(name, surn, age, spec, teacherId) {
-        return {
-          payload: {
-            id: nanoid(),
-            name,
-            surn,
-            age,
-            spec,
-            teacher: teacherId,
-            votes: {
-              id: nanoid(), // добавляем ID для голосов
-              leader: 0,
-              captain: 0,
-            },
-          },
-        };
-      },
-    },
+    // studentAdded: {
+    //   reducer(state, action) {
+    //     state.students.push(action.payload);
+    //   },
+    //   prepare(name, surn, age, spec, teacherId) {
+    //     return {
+    //       payload: {
+    //         id: nanoid(),
+    //         name,
+    //         surn,
+    //         age,
+    //         spec,
+    //         teacher: teacherId,
+    //         votes: {
+    //           id: nanoid(), // добавляем ID для голосов
+    //           leader: 0,
+    //           captain: 0,
+    //         },
+    //       },
+    //     };
+    //   },
+    // },
 
     studentUpdated(state, action) {
       const { id, name, surn, age, spec } = action.payload;
@@ -108,12 +116,14 @@ const studentsSlice = createSlice({
       .addCase(fetchStudents.rejected, (state, action) => {
         state.status = "fail";
         state.error = action.error.message;
+      })
+      .addCase(addStudent.fulfilled, (state, action) => {
+        state.students.push(action.payload);
       });
   },
 });
 
-export const { studentAdded, studentUpdated, voteClicked } =
-  studentsSlice.actions;
+export const { studentUpdated, voteClicked } = studentsSlice.actions;
 export default studentsSlice.reducer;
 
 export const selectAllStudents = (state) => state.students.students;
