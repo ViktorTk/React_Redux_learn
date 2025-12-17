@@ -1,10 +1,35 @@
-import { createSlice, nanoid } from "@reduxjs/toolkit";
+import { createSlice, nanoid, createAsyncThunk } from "@reduxjs/toolkit";
+import { client } from "../../api/client";
 
 const initialState = {
   students: [],
   status: "idle",
   error: null,
 };
+
+// export const fetchStudents = createAsyncThunk(
+//   "students/fetchStudents",
+//   async () => {
+//     const response = await client.get("./fakeServer/students");
+//     return response.data;
+//   }
+// );
+
+export const fetchStudents = createAsyncThunk(
+  "students/fetchStudents",
+  async () => {
+    const response = await client.get("./fakeServer/students");
+    // Нормализуем данные votes
+    const normalizedData = response.data.map((student) => ({
+      ...student,
+      votes:
+        typeof student.votes === "string"
+          ? { id: student.votes, leader: 0, captain: 0 } // Если votes это строка (ID)
+          : student.votes, // Если уже объект
+    }));
+    return normalizedData;
+  }
+);
 
 const studentsSlice = createSlice({
   name: "students",
@@ -27,7 +52,11 @@ const studentsSlice = createSlice({
             age,
             spec,
             teacher: teacherId,
-            votes: { leader: 0, captain: 0 },
+            votes: {
+              id: nanoid(), // добавляем ID для голосов
+              leader: 0,
+              captain: 0,
+            },
           },
         };
       },
@@ -49,9 +78,37 @@ const studentsSlice = createSlice({
         (student) => student.id == studentId
       );
       if (currentStudent) {
-        currentStudent.votes[vote]++;
+        // currentStudent.votes[vote]++;
+
+        if (
+          typeof currentStudent.votes === "object" &&
+          currentStudent.votes !== null
+        ) {
+          currentStudent.votes[vote]++;
+        } else {
+          currentStudent.votes = {
+            id: currentStudent.votes,
+            leader: vote === "leader" ? 1 : 0,
+            captain: vote === "captain" ? 1 : 0,
+          };
+        }
       }
     },
+  },
+  extraReducers(builder) {
+    builder
+      .addCase(fetchStudents.pending, (state) => {
+        state.status = "in progress";
+      })
+      .addCase(fetchStudents.fulfilled, (state, action) => {
+        state.status = "success";
+        // state.students = state.students.concat(action.payload);
+        state.students = action.payload;
+      })
+      .addCase(fetchStudents.rejected, (state, action) => {
+        state.status = "fail";
+        state.error = action.error.message;
+      });
   },
 });
 
