@@ -6,7 +6,9 @@ function Root() {
       <div id="menu">
         <nav>
           <NavLink to={"/students"}>Студенты</NavLink>
-          <a>Преподаватели</a>
+          <NavLink to={"/teachers"} end>
+            Преподаватели
+          </NavLink>
         </nav>
       </div>
       <div id="main-page">

@@ -39,3 +39,7 @@ const teachersSlice = createSlice({
 });
 
 export default teachersSlice.reducer;
+
+export const selectAllTeachers = (state) => state.teachers;
+export const selectTeacherById = (state, teacherId) =>
+  state.teachers.find((teacher) => teacher.id == teacherId);

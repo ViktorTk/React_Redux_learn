@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { studentAdded } from "./studentsSlice";
+import { addStudent } from "./studentsSlice";
 
 export const NewStudentForm = () => {
+  const [requestStatus, setRequestStatus] = useState("idle");
+
   const [name, setName] = useState("");
   const [surn, setSurn] = useState("");
   const [age, setAge] = useState(18);
@@ -18,15 +20,29 @@ export const NewStudentForm = () => {
   const dispatch = useDispatch();
   const teachers = useSelector((state) => state.teachers);
 
-  const onSaveStudentClick = () => {
-    if (name && surn && age && spec) {
-      dispatch(studentAdded(name, surn, age, spec, teacherId));
+  const canBeSaved =
+    [name, surn, age, spec, teacherId].every(Boolean) &&
+    requestStatus === "idle";
 
-      setName("");
-      setSurn("");
-      setAge(18);
-      setSpec("");
-      setTeacherId("");
+  const onSaveStudentClick = async () => {
+    if (canBeSaved) {
+      if (canBeSaved) {
+        try {
+          setRequestStatus("in progress");
+          await dispatch(
+            addStudent({ name, surn, age, spec, teacher: teacherId })
+          ).unwrap();
+          setName("");
+          setSurn("");
+          setAge(18);
+          setSpec("");
+          setTeacherId("");
+        } catch (err) {
+          console.error("save student error: ", err);
+        } finally {
+          setRequestStatus("idle");
+        }
+      }
     }
   };
 

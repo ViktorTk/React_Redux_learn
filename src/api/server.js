@@ -100,10 +100,10 @@ export const handlers = [
   http.post("/fakeServer/students", async ({ request }) => {
     const data = await request.json();
 
-    if (data.conetnt === "error") {
+    if (data.content === "error") {
       await delay(ARTIFICIAL_DELAY_MS);
 
-      return new HttpResponse("ошибка при сохранении данных на сеервер", {
+      return new HttpResponse("ошибка при сохранении данных на сервер", {
         status: 500,
         headers: {
           "Content-Type": "application/json",
@@ -111,16 +111,43 @@ export const handlers = [
       });
     }
 
-    const student = db.student.findFirst({
-      where: { id: { equals: data.student } },
+    const newVote = db.vote.create({
+      leader: 0,
+      captain: 0,
     });
-    data.student = student;
 
-    data.votes = db.votes.create();
+    const teacher = db.teacher.findFirst({
+      where: { id: { equals: data.teacher } },
+    });
+
+    if (!teacher) {
+      await delay(ARTIFICIAL_DELAY_MS);
+      return new HttpResponse("Преподаватель не найден", {
+        status: 404,
+      });
+    }
+
+    const student = db.student.create({
+      id: nanoid(),
+      name: data.name,
+      surn: data.surn,
+      age: Number(data.age),
+      spec: data.spec,
+      teacher: teacher,
+      votes: newVote,
+    });
 
     await delay(ARTIFICIAL_DELAY_MS);
-    return HttpResponse(serializeStudent(student));
+    return new HttpResponse(JSON.stringify(serializeStudent(student)), {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
   }),
 ];
 
 export const worker = setupWorker(...handlers);
+
+worker.listHandlers().forEach((handler) => {
+  console.log(handler.info.header);
+});

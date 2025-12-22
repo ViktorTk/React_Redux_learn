@@ -31,9 +31,10 @@ export const StudentsList = () => {
 
   useEffect(() => {
     if (dataFetch.current) return;
+    dataFetch.current = true;
     if (studentsStatus === "idle") {
       // (dataFetch.current = true)
-      dataFetch.current = true;
+      // dataFetch.current = true;
       dispatch(fetchStudents());
     }
   }, [studentsStatus, dispatch]);

@@ -7,35 +7,36 @@ const initialState = {
   error: null,
 };
 
-// export const fetchStudents = createAsyncThunk(
-//   "students/fetchStudents",
-//   async () => {
-//     const response = await client.get("./fakeServer/students");
-//     return response.data;
-//   }
-// );
-
 export const fetchStudents = createAsyncThunk(
   "students/fetchStudents",
   async () => {
     const response = await client.get("./fakeServer/students");
-    // Нормализуем данные votes
     const normalizedData = response.data.map((student) => ({
       ...student,
       votes:
         typeof student.votes === "string"
-          ? { id: student.votes, leader: 0, captain: 0 } // Если votes это строка (ID)
-          : student.votes, // Если уже объект
+          ? { id: student.votes, leader: 0, captain: 0 }
+          : student.votes,
     }));
     return normalizedData;
   }
 );
 
 export const addStudent = createAsyncThunk(
-  "products/addStudent",
+  "students/addStudent",
   async (newStudent) => {
     const response = await client.post("/fakeServer/students", newStudent);
-    return response.data;
+
+    // Нормализуем votes, если приходит как строка
+    const normalizedData = {
+      ...response.data,
+      votes:
+        typeof response.data.votes === "string"
+          ? { id: response.data.votes, leader: 0, captain: 0 }
+          : response.data.votes,
+    };
+
+    return normalizedData;
   }
 );
 
@@ -43,33 +44,6 @@ const studentsSlice = createSlice({
   name: "students",
   initialState,
   reducers: {
-    // studentAdded(state, action) {
-    //   state.push(action.payload);
-    // },
-
-    // studentAdded: {
-    //   reducer(state, action) {
-    //     state.students.push(action.payload);
-    //   },
-    //   prepare(name, surn, age, spec, teacherId) {
-    //     return {
-    //       payload: {
-    //         id: nanoid(),
-    //         name,
-    //         surn,
-    //         age,
-    //         spec,
-    //         teacher: teacherId,
-    //         votes: {
-    //           id: nanoid(), // добавляем ID для голосов
-    //           leader: 0,
-    //           captain: 0,
-    //         },
-    //       },
-    //     };
-    //   },
-    // },
-
     studentUpdated(state, action) {
       const { id, name, surn, age, spec } = action.payload;
       const desiredStudent = state.students.find((student) => student.id == id);
@@ -86,8 +60,6 @@ const studentsSlice = createSlice({
         (student) => student.id == studentId
       );
       if (currentStudent) {
-        // currentStudent.votes[vote]++;
-
         if (
           typeof currentStudent.votes === "object" &&
           currentStudent.votes !== null
@@ -110,7 +82,6 @@ const studentsSlice = createSlice({
       })
       .addCase(fetchStudents.fulfilled, (state, action) => {
         state.status = "success";
-        // state.students = state.students.concat(action.payload);
         state.students = action.payload;
       })
       .addCase(fetchStudents.rejected, (state, action) => {
@@ -118,7 +89,14 @@ const studentsSlice = createSlice({
         state.error = action.error.message;
       })
       .addCase(addStudent.fulfilled, (state, action) => {
-        state.students.push(action.payload);
+        const student = {
+          ...action.payload,
+          votes:
+            typeof action.payload.votes === "string"
+              ? { id: action.payload.votes, leader: 0, captain: 0 }
+              : action.payload.votes,
+        };
+        state.students.push(student);
       });
   },
 });

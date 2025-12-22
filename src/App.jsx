@@ -3,6 +3,8 @@ import Root from "./app/Root";
 import { StudentsList } from "./parts/students/StudentsList";
 import { StudentPage } from "./parts/students/StudentPage";
 import { EditStudentForm } from "./parts/students/EditStudentForm";
+import { TeachersList } from "./parts/teachers/TeachersList";
+import { TeacherPage } from "./parts/teachers/TeacherPage";
 
 const router = createBrowserRouter([
   {
@@ -20,6 +22,14 @@ const router = createBrowserRouter([
       {
         path: "/editStudent/:studentId",
         element: <EditStudentForm />,
+      },
+      {
+        path: "/teachers",
+        element: <TeachersList />,
+      },
+      {
+        path: "/teachers/teacher/:teacherId",
+        element: <TeacherPage />,
       },
     ],
   },
